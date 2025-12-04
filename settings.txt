@@ -1,0 +1,21 @@
+#POPULATION population
+#SCREEN width height r g b [0-255]
+#BOIDS length width r g b [0-1]
+#VELOCITY min max
+#RANGES visible danger
+#DANGER factor
+#ALIGNMENT factor
+#COHESION factor
+#MARGIN margin
+#TURN speed
+
+POPULATION 1000
+SCREEN 1080 720 0 0 0
+BOIDS 7.5 3.25 .4 .6 1.
+VELOCITY 1.2 4.5
+RANGES 50 5
+ALIGNMENT 0.01
+COHESION 0.0000001
+DANGER 0.004
+MARGIN 100
+TURN 0.01
