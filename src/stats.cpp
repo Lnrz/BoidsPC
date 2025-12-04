@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 #include <numeric>
 
 Stats::Stats(std::string logFile)
@@ -15,6 +16,9 @@ void Stats::startRun() {
 void Stats::endRun() {
     const auto endTime{ std::chrono::steady_clock::now() };
     runTimes.push_back(std::chrono::duration_cast<Duration>(endTime - startTime));
+    if (runNumber % 1000 == 0) {
+        std::cout << "Reached " << runNumber << "th iteration" << std::endl;
+    }
 }
 
 void Stats::log() const {

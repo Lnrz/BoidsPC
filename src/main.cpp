@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iostream>
 #include <numbers>
 #include <random>
 #include <SDL3/SDL.h>
@@ -33,7 +34,8 @@ float calculateNorm(const float x, const float y) {
 
 template<typename LockPolicy>
 void updateBoidsVelocities(Boids& boids, const Grid<LockPolicy>& grid, const Settings::Settings& settings) {
-    for (size_t i{ 0 }; i < boids.population; i++) {
+#pragma omp for schedule(static)
+    for (int i{ 0 }; i < boids.population; i++) {
         size_t visibleBoidsNum{ 0 };
         float dangerX{ 0 };
         float dangerY{ 0 };
@@ -97,8 +99,9 @@ void updateBoidsVelocities(Boids& boids, const Grid<LockPolicy>& grid, const Set
 
 template<typename LockPolicy>
 void updateBoidsPositions(Boids& boids, Grid<LockPolicy>& grid, const Settings::Settings& settings, const uint64_t elapsedMs) {
-    const float delta{ elapsedMs > 0 ? 1.0f / static_cast<float>(elapsedMs) : 1000.0f / 60.0f };
-    for (size_t i{ 0 }; i < boids.population; i++) {
+#pragma omp for schedule(static)
+    for (int i{ 0 }; i < boids.population; i++) {
+        const float delta{ elapsedMs > 0 ? 1.0f / static_cast<float>(elapsedMs) : 1000.0f / 60.0f };
         const auto prevSquare{ grid.coords2square(boids.x[i], boids.y[i]) };
         boids.x[i] += delta * boids.vx[i];
         boids.y[i] += delta * boids.vy[i];
@@ -149,37 +152,53 @@ int main(int argc, char* argv[]) {
     bool isQuitRequested{ false };
 
     Boids boids{ settings.population };
+#ifdef _OPENMP
+    Grid<Lock> grid{ settings.screenWidth, settings.screenHeight, static_cast<size_t>(ceilf(settings.visibleRange)) };
+#else
     Grid grid{ settings.screenWidth, settings.screenHeight, static_cast<size_t>(ceilf(settings.visibleRange)) };
+#endif
     randomizeBoids(boids, grid, settings);
 
     auto lastFrameStartTick{ SDL_GetTicks() };
+    decltype(lastFrameStartTick) currentFrameStartTick{};
+#pragma omp parallel default(none) \
+    shared(boids, grid, lastFrameStartTick, currentFrameStartTick, isQuitRequested, renderer, stats) \
+    firstprivate(settings)
     while (!isQuitRequested) {
-        auto currentFrameStartTick{ SDL_GetTicks() };
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-                case SDL_EVENT_KEY_DOWN: {
-                    if (event.key.scancode == SDL_SCANCODE_ESCAPE) isQuitRequested = true;
-                    break;
+#pragma omp master
+        {
+            currentFrameStartTick = SDL_GetTicks();
+            SDL_Event event;
+            while (SDL_PollEvent(&event)) {
+                switch (event.type) {
+                    case SDL_EVENT_KEY_DOWN: {
+                        if (event.key.scancode == SDL_SCANCODE_ESCAPE) isQuitRequested = true;
+                        break;
+                    }
+                    case SDL_EVENT_WINDOW_CLOSE_REQUESTED: {
+                        isQuitRequested = true;
+                        break;
+                    }
+                    default: {}
                 }
-                case SDL_EVENT_WINDOW_CLOSE_REQUESTED: {
-                    isQuitRequested = true;
-                    break;
-                }
-                default: {}
             }
-        }
 
-        stats.startRun();
+            stats.startRun();
+        }
+#pragma omp barrier
         updateBoidsVelocities(boids, grid, settings);
         updateBoidsPositions(boids, grid, settings, currentFrameStartTick - lastFrameStartTick);
-        stats.endRun();
 
-        updateBoidsVertices(boids, renderer, settings);
-        SDL_RenderClear(renderer);
-        SDL_RenderGeometry(renderer, nullptr, boids.vertices.data(), static_cast<int>(3 * settings.population), nullptr, 0);
-        SDL_RenderPresent(renderer);
-        lastFrameStartTick = currentFrameStartTick;
+#pragma omp master
+        {
+            stats.endRun();
+
+            updateBoidsVertices(boids, renderer, settings);
+            SDL_RenderClear(renderer);
+            SDL_RenderGeometry(renderer, nullptr, boids.vertices.data(), static_cast<int>(3 * settings.population), nullptr, 0);
+            SDL_RenderPresent(renderer);
+            lastFrameStartTick = currentFrameStartTick;
+        }
     }
     stats.log();
 

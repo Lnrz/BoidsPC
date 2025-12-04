@@ -16,6 +16,14 @@ add_subdirectory(lib/SDL-release-3.2.24 EXCLUDE_FROM_ALL)
 
 target_link_libraries(Boids PRIVATE SDL3::SDL3)
 
+if (MSVC)
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /fp:fast /favor:INTEL64")
+
+    if (USE_OPENMP)
+        target_compile_options(Boids PRIVATE /openmp)
+    endif()
+endif()
+
 # Copy SDL3 dll to boids executable folder (only in Windows)
 if(WIN32)
     add_custom_command(
