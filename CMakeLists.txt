@@ -6,8 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(Boids src/main.cpp
         src/boids.h
         src/boids.cpp
-        src/grid.cpp
-        src/grid.h
+        src/grid.hpp
         src/settings.h
         src/settings.cpp
         src/stats.cpp

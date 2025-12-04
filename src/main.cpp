@@ -3,11 +3,12 @@
 #include <random>
 #include <SDL3/SDL.h>
 #include "boids.h"
-#include "grid.h"
+#include "grid.hpp"
 #include "settings.h"
 #include "stats.h"
 
-void randomizeBoids(Boids& boids, Grid& grid, const Settings::Settings& settings) {
+template<typename LockPolicy>
+void randomizeBoids(Boids& boids, Grid<LockPolicy>& grid, const Settings::Settings& settings) {
     std::mt19937 generator{ std::random_device{}() };
     for (size_t i{ 0 }; i < boids.population; i++) {
         boids.x[i] = std::fmodf(static_cast<float>(generator()), static_cast<float>(settings.screenWidth) - .1f);
@@ -30,7 +31,8 @@ float calculateNorm(const float x, const float y) {
     return std::sqrtf(x * x + y * y);
 }
 
-void updateBoidsVelocities(Boids& boids, const Grid& grid, const Settings::Settings& settings) {
+template<typename LockPolicy>
+void updateBoidsVelocities(Boids& boids, const Grid<LockPolicy>& grid, const Settings::Settings& settings) {
     for (size_t i{ 0 }; i < boids.population; i++) {
         size_t visibleBoidsNum{ 0 };
         float dangerX{ 0 };
@@ -93,7 +95,8 @@ void updateBoidsVelocities(Boids& boids, const Grid& grid, const Settings::Setti
     }
 }
 
-void updateBoidsPositions(Boids& boids, Grid& grid, const Settings::Settings& settings, const uint64_t elapsedMs) {
+template<typename LockPolicy>
+void updateBoidsPositions(Boids& boids, Grid<LockPolicy>& grid, const Settings::Settings& settings, const uint64_t elapsedMs) {
     const float delta{ elapsedMs > 0 ? 1.0f / static_cast<float>(elapsedMs) : 1000.0f / 60.0f };
     for (size_t i{ 0 }; i < boids.population; i++) {
         const auto prevSquare{ grid.coords2square(boids.x[i], boids.y[i]) };
