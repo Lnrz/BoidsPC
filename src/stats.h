@@ -9,7 +9,7 @@ class Stats {
 public:
     using Duration = std::chrono::microseconds;
 
-    Stats(std::string logFile);
+    explicit Stats(std::string logFile);
 
     void startRun();
     void endRun();

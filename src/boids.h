@@ -5,7 +5,7 @@
 #include <SDL3/SDL.h>
 
 struct Boids {
-    Boids(size_t population);
+    explicit Boids(size_t population);
 
     const size_t population;
     std::vector<float> x;
