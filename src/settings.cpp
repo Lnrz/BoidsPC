@@ -25,6 +25,9 @@ namespace {
             if (word == "POPULATION") {
                 in >> settings.population;
             }
+            else if (word == "MAXRUN") {
+                in >> settings.maxRunNumber;
+            }
             else if (word == "SCREEN") {
                 in >> settings.screenWidth >> settings.screenHeight;
                 in >> settings.clearRed >> settings.clearGreen >> settings.clearBlue;
@@ -63,6 +66,10 @@ namespace {
     void checkSettings(const Settings::Settings& settings) {
         if (settings.population < 1) {
             std::cerr << "Population should be at least 1, but was " << settings.population << std::endl;
+            exit(-1);
+        }
+        if (settings.maxRunNumber < 1) {
+            std::cerr << "Max number of runs should be at least 1, but was " << settings.maxRunNumber << std::endl;
             exit(-1);
         }
         if (settings.maxVelocity < settings.minVelocity) {

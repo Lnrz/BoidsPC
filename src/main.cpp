@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <iostream>
 #include <numbers>
 #include <random>
 #include <SDL3/SDL.h>
@@ -159,12 +158,14 @@ int main(int argc, char* argv[]) {
 #endif
     randomizeBoids(boids, grid, settings);
 
+    size_t runNumber{ 0 };
     auto lastFrameStartTick{ SDL_GetTicks() };
     decltype(lastFrameStartTick) currentFrameStartTick{};
 #pragma omp parallel default(none) \
     shared(boids, grid, lastFrameStartTick, currentFrameStartTick, isQuitRequested, renderer, stats) \
-    firstprivate(settings)
-    while (!isQuitRequested) {
+    firstprivate(settings, runNumber)
+    while (!isQuitRequested && runNumber < settings.maxRunNumber) {
+        runNumber++;
 #pragma omp master
         {
             currentFrameStartTick = SDL_GetTicks();

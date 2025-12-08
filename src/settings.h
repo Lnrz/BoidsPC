@@ -11,6 +11,7 @@ namespace Settings {
         size_t population{};
         size_t screenWidth {};
         size_t screenHeight{};
+        size_t maxRunNumber{};
         float boidsLength{};
         float boidsWidth{};
         float minVelocity{}, maxVelocity{};
