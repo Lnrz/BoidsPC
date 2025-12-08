@@ -7,7 +7,7 @@
 
 class Stats {
 public:
-    using Duration = std::chrono::milliseconds;
+    using Duration = std::chrono::microseconds;
 
     Stats(std::string logFile);
 
