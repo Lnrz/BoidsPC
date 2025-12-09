@@ -12,6 +12,14 @@ struct Boids {
     std::vector<float> y;
     std::vector<float> vx;
     std::vector<float> vy;
+    std::vector<float> cohesionx;
+    std::vector<float> cohesiony;
+    std::vector<float> alignmentx;
+    std::vector<float> alignmenty;
+    std::vector<float> dangerx;
+    std::vector<float> dangery;
+    std::vector<float> turnx;
+    std::vector<float> turny;
     std::vector<SDL_Vertex> vertices;
 };
 

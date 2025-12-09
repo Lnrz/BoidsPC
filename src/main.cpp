@@ -36,15 +36,13 @@ void updateBoidsVelocities(Boids& boids, const Grid<LockPolicy>& grid, const Set
 #pragma omp for schedule(static)
     for (int i{ 0 }; i < boids.population; i++) {
         size_t visibleBoidsNum{ 0 };
-        float dangerX{ 0 };
-        float dangerY{ 0 };
-        float averageX { boids.x[i] };
-        float averageY { boids.y[i] };
-        float averageVX { boids.vx[i] };
-        float averageVY { boids.vy[i] };
+        float dangerX{ 0 }, dangerY{ 0 };
+        float averageX { boids.x[i] }, averageY { boids.y[i] };
+        float averageVX { boids.vx[i] }, averageVY { boids.vy[i] };
 
         // Compute alignment, danger and cohesion velocity modifiers
         for (const auto neighborIndex : grid.getNeighbors(boids.x[i], boids.y[i])) {
+            if (neighborIndex == i) continue;
             const auto squaredDistance{
                 calculateSquaredDistance(boids.x[i], boids.y[i],
                                         boids.x[neighborIndex], boids.y[neighborIndex])
@@ -75,18 +73,32 @@ void updateBoidsVelocities(Boids& boids, const Grid<LockPolicy>& grid, const Set
         if (boids.y[i] < static_cast<float>(settings.margin)) yTurnFactor = 1;
         else if (boids.y[i] > static_cast<float>(settings.screenHeight - settings.margin)) yTurnFactor = -1;
 
+        boids.cohesionx[i] = averageX - boids.x[i];
+        boids.cohesiony[i] = averageY - boids.y[i];
+        boids.alignmentx[i] = averageVX - boids.vx[i];
+        boids.alignmenty[i] = averageVY - boids.vy[i];
+        boids.dangerx[i] = dangerX;
+        boids.dangery[i] = dangerY;
+        boids.turnx[i] = xTurnFactor;
+        boids.turny[i] = yTurnFactor;
+    }
+#pragma omp for schedule(static)
+    for (int i{ 0 }; i < boids.population; i++) {
         // Compute velocity
-        boids.vx[i] += settings.dangerFactor * dangerX +
-                       settings.cohesionFactor * (averageX - boids.x[i]) +
-                       settings.alignmentFactor * (averageVX - boids.vx[i]) +
-                       settings.turnSpeed * xTurnFactor;
-        boids.vy[i] += settings.dangerFactor * dangerY +
-                       settings.cohesionFactor * (averageY - boids.y[i]) +
-                       settings.alignmentFactor * (averageVY - boids.vy[i]) +
-                       settings.turnSpeed * yTurnFactor;
-
+        boids.vx[i] += settings.dangerFactor * boids.dangerx[i];
+        boids.vx[i] += settings.cohesionFactor * boids.cohesionx[i];
+        boids.vx[i] += settings.alignmentFactor * boids.alignmentx[i];
+        boids.vx[i] += settings.turnSpeed * boids.turnx[i];
+        boids.vy[i] += settings.dangerFactor * boids.dangery[i];
+        boids.vy[i] += settings.cohesionFactor * boids.cohesiony[i];
+        boids.vy[i] += settings.alignmentFactor * boids.alignmenty[i];
+        boids.vy[i] += settings.turnSpeed * boids.turny[i];
+    }
+#pragma omp for schedule(static)
+    for (int i{ 0 }; i < boids.population; i++) {
         // Bound velocity
-        if (const auto velocityNorm{ calculateNorm(boids.vx[i], boids.vy[i]) }; velocityNorm < settings.minVelocity && velocityNorm > 0) {
+        const auto velocityNorm{ calculateNorm(boids.vx[i], boids.vy[i]) };
+        if (velocityNorm < settings.minVelocity && velocityNorm > 0) {
             boids.vx[i] = settings.minVelocity * boids.vx[i] / velocityNorm;
             boids.vy[i] = settings.minVelocity * boids.vy[i] / velocityNorm;
         } else if (velocityNorm > settings.maxVelocity) {
