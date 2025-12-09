@@ -98,15 +98,19 @@ void updateBoidsVelocities(Boids& boids, const Grid<LockPolicy>& grid, const Set
 
 template<typename LockPolicy>
 void updateBoidsPositions(Boids& boids, Grid<LockPolicy>& grid, const Settings::Settings& settings, const uint64_t elapsedMs) {
-#pragma omp for schedule(static)
+    const float delta{ elapsedMs > 0 ? 1.0f / static_cast<float>(elapsedMs) : 1000.0f / 60.0f };
+#pragma omp  for schedule(static)
     for (int i{ 0 }; i < boids.population; i++) {
-        const float delta{ elapsedMs > 0 ? 1.0f / static_cast<float>(elapsedMs) : 1000.0f / 60.0f };
-        const auto prevSquare{ grid.coords2square(boids.x[i], boids.y[i]) };
         boids.x[i] += delta * boids.vx[i];
         boids.y[i] += delta * boids.vy[i];
+    }
+#pragma omp for schedule(static)
+    for (int i{ 0 }; i < boids.population; i++) {
+        const auto prevSquare{ grid.coords2square(boids.x[i] - delta * boids.vx[i], boids.y[i] - delta * boids.vy[i]) };
         boids.x[i] = std::clamp(boids.x[i], 0.0f, static_cast<float>(settings.screenWidth) - .1f);
         boids.y[i] = std::clamp(boids.y[i], 0.0f, static_cast<float>(settings.screenHeight) - .1f);
-        if (const auto nextSquare{ grid.coords2square(boids.x[i], boids.y[i]) }; prevSquare != nextSquare) {
+        const auto nextSquare{ grid.coords2square(boids.x[i], boids.y[i]) };
+        if (prevSquare != nextSquare) {
             grid.remove(i, prevSquare);
             grid.add(i, nextSquare);
         }

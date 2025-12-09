@@ -17,7 +17,7 @@ add_subdirectory(lib/SDL-release-3.2.24 EXCLUDE_FROM_ALL)
 target_link_libraries(Boids PRIVATE SDL3::SDL3)
 
 if (MSVC)
-    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /fp:fast /favor:INTEL64")
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /fp:fast /favor:INTEL64 /arch:AVX2 /Qvec-report:1")
 
     if (USE_OPENMP)
         target_compile_options(Boids PRIVATE /openmp)
