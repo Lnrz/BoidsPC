@@ -162,7 +162,7 @@ int main(int argc, char* argv[]) {
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_CreateWindowAndRenderer("Boids", static_cast<int>(settings.screenWidth), static_cast<int>(settings.screenHeight), 0, &window, &renderer);
-    SDL_SetRenderVSync(renderer, 1);
+    SDL_SetRenderVSync(renderer, settings.disableVSync ? SDL_RENDERER_VSYNC_DISABLED : 1);
     SDL_SetRenderDrawColor(renderer, settings.clearRed, settings.clearGreen, settings.clearBlue, SDL_ALPHA_OPAQUE);
     bool isQuitRequested{ false };
 
@@ -180,7 +180,7 @@ int main(int argc, char* argv[]) {
 #pragma omp parallel default(none) \
     shared(boids, grid, lastFrameStartTick, currentFrameStartTick, isQuitRequested, renderer, stats) \
     firstprivate(settings, runNumber)
-    while (!isQuitRequested && runNumber < settings.maxRunNumber) {
+    while (!isQuitRequested && (settings.maxRunNumber == 0 || runNumber < settings.maxRunNumber)) {
         runNumber++;
 #pragma omp master
         {

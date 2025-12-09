@@ -12,6 +12,7 @@ namespace Settings {
         size_t screenWidth {};
         size_t screenHeight{};
         size_t maxRunNumber{};
+        bool disableVSync{};
         float boidsLength{};
         float boidsWidth{};
         float minVelocity{}, maxVelocity{};
