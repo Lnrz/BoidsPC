@@ -176,7 +176,7 @@ int main(int argc, char* argv[]) {
     size_t runNumber{ 0 };
     auto lastFrameStartTick{ std::chrono::steady_clock::now() };
     decltype(lastFrameStartTick) currentFrameStartTick{};
-#pragma omp parallel default(none) \
+#pragma omp parallel num_threads(16) default(none) \
     shared(boids, grid, lastFrameStartTick, currentFrameStartTick, isQuitRequested, renderer, stats) \
     firstprivate(settings, runNumber)
     while (!isQuitRequested && (settings.maxRunNumber == 0 || runNumber < settings.maxRunNumber)) {
