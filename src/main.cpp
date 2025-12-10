@@ -33,7 +33,7 @@ float calculateNorm(const float x, const float y) {
 
 template<typename LockPolicy>
 void updateBoidsVelocities(Boids& boids, const Grid<LockPolicy>& grid, const Settings::Settings& settings) {
-#pragma omp for schedule(static)
+#pragma omp for schedule(dynamic,100)
     for (int i{ 0 }; i < boids.population; i++) {
         size_t visibleBoidsNum{ 0 };
         float dangerX{ 0 }, dangerY{ 0 };
@@ -110,7 +110,7 @@ void updateBoidsVelocities(Boids& boids, const Grid<LockPolicy>& grid, const Set
 
 template<typename LockPolicy>
 void updateBoidsPositions(Boids& boids, Grid<LockPolicy>& grid, const Settings::Settings& settings, const std::chrono::duration<float> elapsedSec) {
-#pragma omp  for schedule(static)
+#pragma omp for schedule(static)
     for (int i{ 0 }; i < boids.population; i++) {
         boids.x[i] += elapsedSec.count() * boids.vx[i];
         boids.y[i] += elapsedSec.count() * boids.vy[i];
