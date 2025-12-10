@@ -109,16 +109,15 @@ void updateBoidsVelocities(Boids& boids, const Grid<LockPolicy>& grid, const Set
 }
 
 template<typename LockPolicy>
-void updateBoidsPositions(Boids& boids, Grid<LockPolicy>& grid, const Settings::Settings& settings, const uint64_t elapsedMs) {
-    const float delta{ elapsedMs > 0 ? 1.0f / static_cast<float>(elapsedMs) : 1000.0f / 60.0f };
+void updateBoidsPositions(Boids& boids, Grid<LockPolicy>& grid, const Settings::Settings& settings, const std::chrono::duration<float> elapsedSec) {
 #pragma omp  for schedule(static)
     for (int i{ 0 }; i < boids.population; i++) {
-        boids.x[i] += delta * boids.vx[i];
-        boids.y[i] += delta * boids.vy[i];
+        boids.x[i] += elapsedSec.count() * boids.vx[i];
+        boids.y[i] += elapsedSec.count() * boids.vy[i];
     }
 #pragma omp for schedule(static)
     for (int i{ 0 }; i < boids.population; i++) {
-        const auto prevSquare{ grid.coords2square(boids.x[i] - delta * boids.vx[i], boids.y[i] - delta * boids.vy[i]) };
+        const auto prevSquare{ grid.coords2square(boids.x[i] - elapsedSec.count() * boids.vx[i], boids.y[i] - elapsedSec.count() * boids.vy[i]) };
         boids.x[i] = std::clamp(boids.x[i], 0.0f, static_cast<float>(settings.screenWidth) - .1f);
         boids.y[i] = std::clamp(boids.y[i], 0.0f, static_cast<float>(settings.screenHeight) - .1f);
         const auto nextSquare{ grid.coords2square(boids.x[i], boids.y[i]) };
@@ -175,7 +174,7 @@ int main(int argc, char* argv[]) {
     randomizeBoids(boids, grid, settings);
 
     size_t runNumber{ 0 };
-    auto lastFrameStartTick{ SDL_GetTicks() };
+    auto lastFrameStartTick{ std::chrono::steady_clock::now() };
     decltype(lastFrameStartTick) currentFrameStartTick{};
 #pragma omp parallel default(none) \
     shared(boids, grid, lastFrameStartTick, currentFrameStartTick, isQuitRequested, renderer, stats) \
@@ -184,7 +183,7 @@ int main(int argc, char* argv[]) {
         runNumber++;
 #pragma omp master
         {
-            currentFrameStartTick = SDL_GetTicks();
+            currentFrameStartTick = std::chrono::steady_clock::now();
             SDL_Event event;
             while (SDL_PollEvent(&event)) {
                 switch (event.type) {
