@@ -12,6 +12,8 @@ namespace Settings {
         size_t screenWidth {};
         size_t screenHeight{};
         size_t maxRunNumber{};
+        size_t threadsNumber{};
+        size_t neighborLoopChunkSize{};
         bool disableVSync{};
         float boidsLength{};
         float boidsWidth{};

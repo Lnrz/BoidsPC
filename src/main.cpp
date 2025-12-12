@@ -33,7 +33,7 @@ float calculateNorm(const float x, const float y) {
 
 template<typename LockPolicy>
 void updateBoidsVelocities(Boids& boids, const Grid<LockPolicy>& grid, const Settings::Settings& settings) {
-#pragma omp for schedule(dynamic,100)
+#pragma omp for schedule(dynamic, settings.neighborLoopChunkSize)
     for (int i{ 0 }; i < boids.population; i++) {
         size_t visibleBoidsNum{ 0 };
         float dangerX{ 0 }, dangerY{ 0 };
@@ -173,11 +173,10 @@ int main(int argc, char* argv[]) {
     Grid grid{ settings.screenWidth, settings.screenHeight, gridSquareSize };
 #endif
     randomizeBoids(boids, grid, settings);
-
     size_t runNumber{ 0 };
     auto lastFrameStartTick{ std::chrono::steady_clock::now() };
     decltype(lastFrameStartTick) currentFrameStartTick{};
-#pragma omp parallel num_threads(16) default(none) \
+#pragma omp parallel num_threads(settings.threadsNumber) default(none) \
     shared(boids, grid, lastFrameStartTick, currentFrameStartTick, isQuitRequested, renderer, stats) \
     firstprivate(settings, runNumber)
     while (!isQuitRequested && (settings.maxRunNumber == 0 || runNumber < settings.maxRunNumber)) {

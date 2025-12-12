@@ -28,6 +28,12 @@ namespace {
             else if (word == "MAXRUN") {
                 in >> settings.maxRunNumber;
             }
+            else if (word == "THREADS") {
+                in >> settings.threadsNumber;
+            }
+            else if (word == "NEIGHBORLOOPCHUNKSIZE") {
+                in >> settings.neighborLoopChunkSize;
+            }
             else if (word == "SCREEN") {
                 in >> settings.screenWidth >> settings.screenHeight;
                 in >> settings.clearRed >> settings.clearGreen >> settings.clearBlue;
@@ -96,7 +102,17 @@ namespace {
             std::cerr << "green channel was " << settings.boidsColor.g << ", ";
             std::cerr << "blue channel was " << settings.boidsColor.b << std::endl;
             exit(-1);
+            }
+#ifdef _OPENMP
+        if (settings.threadsNumber < 1) {
+            std::cerr << "Number of threads should be at least 1, but was " << settings.threadsNumber << std::endl;
+            exit(-1);
         }
+        if (settings.neighborLoopChunkSize < 1) {
+            std::cerr << "Neighbor loop chunk size should be at least 1, but was " << settings.neighborLoopChunkSize << std::endl;
+            exit(-1);
+        }
+#endif
     }
 }
 
