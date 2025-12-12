@@ -166,10 +166,11 @@ int main(int argc, char* argv[]) {
     bool isQuitRequested{ false };
 
     Boids boids{ settings.population };
+    const auto gridSquareSize{ static_cast<size_t>(ceilf(2.f * settings.visibleRange)) };
 #ifdef _OPENMP
-    Grid<Lock> grid{ settings.screenWidth, settings.screenHeight, static_cast<size_t>(ceilf(settings.visibleRange)) };
+    Grid<Lock> grid{ settings.screenWidth, settings.screenHeight, gridSquareSize };
 #else
-    Grid grid{ settings.screenWidth, settings.screenHeight, static_cast<size_t>(ceilf(settings.visibleRange)) };
+    Grid grid{ settings.screenWidth, settings.screenHeight, gridSquareSize };
 #endif
     randomizeBoids(boids, grid, settings);
 

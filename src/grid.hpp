@@ -115,7 +115,7 @@ void Grid<LockPolicy>::remove(const size_t index, const size_t square) {
 
 template<typename LockPolicy>
 std::vector<size_t> Grid<LockPolicy>::getNeighbors(const float x, const float y) const {
-    const auto occupiedSquare = coords2square(x, y);
+    const auto occupiedSquare{ coords2square(x, y) };
     float trash{};
     const bool isTowardsRight{ modf(x / static_cast<float>(squareSize), &trash) >= 0.5};
     const bool isTowardsTop{ modf(y / static_cast<float>(squareSize), &trash) >= 0.5};
