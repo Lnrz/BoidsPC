@@ -1,5 +1,7 @@
 #POPULATION population
 #MAXRUN maximum number of runs
+#THREADS number of threads to use
+#NEIGHBORLOOPCHUNKSIZE number of iterations in a chunk of the neighbor loop
 #SCREEN width height r g b [0-255]
 #BOIDS length width r g b [0-1]
 #VELOCITY min max
