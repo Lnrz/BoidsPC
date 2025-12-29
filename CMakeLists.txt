@@ -12,7 +12,7 @@ add_executable(Boids src/main.cpp
         src/stats.cpp
         src/stats.h)
 
-add_subdirectory(lib/SDL-release-3.2.24 EXCLUDE_FROM_ALL)
+add_subdirectory(lib/SDL EXCLUDE_FROM_ALL)
 
 target_link_libraries(Boids PRIVATE SDL3::SDL3)
 
