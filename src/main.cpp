@@ -7,6 +7,7 @@
 #include "settings.h"
 #include "stats.h"
 
+// Initialize "boids" randomly and change "grid" accordingly.
 template<typename LockPolicy>
 void randomizeBoids(Boids& boids, Grid<LockPolicy>& grid, const Settings::Settings& settings) {
     std::mt19937 generator{ std::random_device{}() };
@@ -23,14 +24,17 @@ void randomizeBoids(Boids& boids, Grid<LockPolicy>& grid, const Settings::Settin
     }
 }
 
+// Calculate squared distance between ("x1","y1") and ("x2","y2").
 float calculateSquaredDistance(const float x1, const float y1, const float x2, const float y2) {
     return powf(x1 - x2, 2) + powf(y2 - y1, 2);
 }
 
+// Calculate the Euclidean norm of ("x","y")
 float calculateNorm(const float x, const float y) {
     return std::sqrtf(x * x + y * y);
 }
 
+// Update "boids" velocities.
 template<typename LockPolicy>
 void updateBoidsVelocities(Boids& boids, const Grid<LockPolicy>& grid, const Settings::Settings& settings) {
 #pragma omp for schedule(dynamic, settings.neighborLoopChunkSize)
@@ -96,7 +100,7 @@ void updateBoidsVelocities(Boids& boids, const Grid<LockPolicy>& grid, const Set
     }
 #pragma omp for schedule(static)
     for (int i{ 0 }; i < boids.population; i++) {
-        // Bound velocity
+        // Clamp velocity
         const auto velocityNorm{ calculateNorm(boids.vx[i], boids.vy[i]) };
         if (velocityNorm < settings.minVelocity && velocityNorm > 0) {
             boids.vx[i] = settings.minVelocity * boids.vx[i] / velocityNorm;
@@ -108,6 +112,7 @@ void updateBoidsVelocities(Boids& boids, const Grid<LockPolicy>& grid, const Set
     }
 }
 
+// Update "boids" positions and "grid" accordingly.
 template<typename LockPolicy>
 void updateBoidsPositions(Boids& boids, Grid<LockPolicy>& grid, const Settings::Settings& settings, const std::chrono::duration<float> elapsedSec) {
 #pragma omp for schedule(static)
@@ -128,6 +133,7 @@ void updateBoidsPositions(Boids& boids, Grid<LockPolicy>& grid, const Settings::
     }
 }
 
+// Update "boids" vertices.
 void updateBoidsVertices(Boids& boids, SDL_Renderer* renderer, const Settings::Settings& settings) {
     for (size_t i{ 0 }; i < boids.population; i++) {
         const float norm{ calculateNorm(boids.vx[i], boids.vy[i]) };
@@ -173,6 +179,7 @@ int main(int argc, char* argv[]) {
     Grid grid{ settings.screenWidth, settings.screenHeight, gridSquareSize };
 #endif
     randomizeBoids(boids, grid, settings);
+
     size_t runNumber{ 0 };
     auto lastFrameStartTick{ std::chrono::steady_clock::now() };
     decltype(lastFrameStartTick) currentFrameStartTick{};

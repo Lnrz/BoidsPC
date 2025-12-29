@@ -77,6 +77,11 @@ namespace {
             std::cerr << "Population should be at least 1, but was " << settings.population << std::endl;
             exit(-1);
         }
+        if (settings.screenWidth < 600 || settings.screenHeight < 600) {
+            std::cerr << "Window size should be at least (600,600)" << std::endl;
+            std::cerr << "Window size was (" << settings.screenWidth << "," << settings.screenHeight << ")" << std::endl;
+            exit(-1);
+        }
         if (settings.maxVelocity < settings.minVelocity) {
             std::cerr << "Max velocity should not be less than min velocity" << std::endl;
             std::cerr << "Max velocity was " << settings.maxVelocity << ", ";
@@ -87,6 +92,14 @@ namespace {
             std::cerr << "Boids length and width can not be lower or equal to 0." << std::endl;
             std::cerr << "Boids length was " << settings.boidsLength << ", ";
             std::cerr << "boids width was " << settings.boidsWidth << std::endl;
+            exit(-1);
+        }
+        if (settings.visibleRange < 0) {
+            std::cerr << "Visible range should be at least 0, but was " << settings.visibleRange << std::endl;
+            exit(-1);
+        }
+        if (settings.dangerRange < 0) {
+            std::cerr << "Danger range should be at least 0, but was " << settings.dangerRange << std::endl;
             exit(-1);
         }
         if (settings.visibleRange < settings.dangerRange) {

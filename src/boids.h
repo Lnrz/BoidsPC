@@ -4,6 +4,7 @@
 #include <vector>
 #include <SDL3/SDL.h>
 
+// Struct holding all the data related to boids.
 struct Boids {
     explicit Boids(size_t population);
 

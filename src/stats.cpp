@@ -23,7 +23,8 @@ void Stats::endRun() {
 
 void Stats::log() const {
     std::ofstream log{logFile, std::ofstream::app};
-    const auto [minIt, maxIt] = std::minmax_element(runTimes.cbegin(), runTimes.cend());
+    const auto [minIt, maxIt] =
+        std::minmax_element(runTimes.cbegin(), runTimes.cend());
     const auto meanRunTime{
         std::accumulate(runTimes.begin(), runTimes.end(), Duration{}) / runNumber
     };

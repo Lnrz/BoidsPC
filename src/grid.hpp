@@ -5,6 +5,9 @@
 #include <cmath>
 #include <omp.h>
 
+// Dummy "LockPolicy" with an empty implementations.
+//
+// Does not provide locking functionality.
 class NoLock {
 protected:
     NoLock(size_t width, size_t height) {};
@@ -13,36 +16,70 @@ protected:
     void releaseLock(size_t square) {};
 };
 
+// "LockPolicy" implementing locking with OpenMP locks.
 class Lock {
 protected:
     Lock(size_t width, size_t height);
     ~Lock();
 
+    // Acquire lock of index "square".
     void acquireLock(size_t square);
+    // Release lock of index ""square.
     void releaseLock(size_t square);
 
 private:
     std::vector<omp_lock_t> locks;
 };
 
+// Spatial data structure for partitioning a 2D area into squares.
+//
+// "LockPolicy" determines what methods to use for locking.
+// By default, it uses "NoLock" as "LockPolicy", meaning there is no locking.
+// For examples of "LockPolicy" refer to the classes "NoLock" and "Lock".
 template<typename LockPolicy = NoLock>
 class Grid : private LockPolicy {
 public:
+    // The grid will partition the "width"x"height" area into squares of size "squareSize"
     Grid(size_t width, size_t height, size_t squareSize);
 
+    // Add "index" to the square containing the point ("x","y").
+    //
+    // Multiple "add" will insert the same "index" multiple times.
+    //
+    // Using invalid ("x","y") will result in undefined behavior.
     void add(size_t index, float x, float y);
+    // Add "index" to the square of index "square".
+    //
+    // Multiple "add" will insert the same "index" multiple times.
+    //
+    // Using invalid square "index" will result in undefined behavior.
     void add(size_t index, size_t square);
 
+    // Remove "index" from the square containing the point ("x","y").
+    //
+    // Using invalid ("x","y") will result in undefined behavior.
     void remove(size_t index, float x, float y);
+    // Remove "index" from the square of index "square".
+    //
+    // Using invalid square "index" will result in undefined behavior.
     void remove(size_t index, size_t square);
 
+    // Return the neighbors' indices of the point ("x","y").
+    //
+    // It assumes that the visibility range is half the size of a square.
+    //
+    // Using invalid ("x","y") will result in undefined behavior.
     [[nodiscard]]
     std::vector<size_t> getNeighbors(float x, float y) const;
 
+    // Return the index of the square containing the point ("x","y").
+    //
+    // Since it doesn't check for ("x","y") validity, it can return an invalid index.
     [[nodiscard]]
     size_t coords2square(float x, float y) const;
 
 private:
+    // Check if "index" is a valid square index.
     [[nodiscard]]
     bool isIndexValid(size_t index) const;
 

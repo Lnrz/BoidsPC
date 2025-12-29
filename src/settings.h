@@ -7,6 +7,9 @@
 #include "SDL3/SDL_pixels.h"
 
 namespace Settings {
+    // Struct holding all the application settings
+    //
+    // For more information about the settings refer to the README.
     struct Settings {
         size_t population{};
         size_t screenWidth {};
@@ -31,6 +34,10 @@ namespace Settings {
         float turnSpeed{};
     };
 
+    // Load the settings from the file found at "path" and verify them.
+    //
+    // If there is no file at "path" print an error string and exit the program.
+    // If a setting has an invalid value print an error string and exit the program.
     Settings loadSettings(const std::string& path);
 }
 
