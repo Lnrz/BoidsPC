@@ -33,9 +33,11 @@ endif()
 1. Create a folder called "lib" in the root folder
 2. Download SDL3 and put it into the "lib" folder renaming it "SDL"\
 (the program was tested with SDL 3.2.24)
-3. Build with CMake (you can decide whether to enable or disable OpenMP)
+3. Build with CMake
+(you can decide whether to enable or disable OpenMP)
+(make sure to build in "Release" mode, how to do it depends on which generator you use)
 ```sh
-cmake -B build -DCMAKE_BUILD_TYPE=Release -DUSE_OPENMP=<ON/OFF>
+cmake -B build -DUSE_OPENMP=<ON/OFF>
 cmake --build build
 ```
 
