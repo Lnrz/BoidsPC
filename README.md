@@ -13,6 +13,8 @@ In addition to these I implemented 2 additional rules:
 + velocity clamping: the velocity of each boid should be in a certain range;
 + turning: when a boid gets too close to the border of the window it starts turning.
 
+![A frame of the boids](.\img\BoidsImage.png)
+
 ## How to Build
 
 **IMPORTANT**\
@@ -20,7 +22,7 @@ If you are not using MSVC to compile the code you have to add to [CMakeList](CMa
 Your code should look like this:
 ```cmake
 if (<MY_COMPILER>)
-    set(CMAKE_CXX_FLAGS_RELEASE <FLAGS_FOR_COMPILING_FOR_SPEED>)
+    set(CMAKE_CXX_FLAGS_RELEASE <FLAGS_TO_COMPILE_FOR_SPEED>)
 
     if (USE_OPENMP)
         target_compile_options(Boids PRIVATE <FLAG_TO_ACTIVATE_OPENMP>)
