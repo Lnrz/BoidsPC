@@ -13,7 +13,7 @@ In addition to these I implemented 2 additional rules:
 + velocity clamping: the velocity of each boid should be in a certain range;
 + turning: when a boid gets too close to the border of the window it starts turning.
 
-![A frame of the boids](.\img\BoidsImage.png)
+![A frame of the boids](img\BoidsImage.png)
 
 ## How to Build
 
