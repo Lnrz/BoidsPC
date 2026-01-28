@@ -8,6 +8,8 @@
 // Simple class to register stats across runs.
 class Stats {
 public:
+    using Clock = std::chrono::steady_clock;
+    using TimePoint = std::chrono::time_point<std::chrono::steady_clock>;
     using Duration = std::chrono::microseconds;
 
     //"logFile" is the path of the file in which the stats will be appended.
@@ -28,7 +30,7 @@ public:
 private:
     std::string logFile{};
     uint32_t runNumber{};
-    std::chrono::time_point<std::chrono::steady_clock> startTime{};
+    TimePoint startTime{};
     std::vector<Duration> runTimes{};
 };
 

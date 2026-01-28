@@ -1,5 +1,4 @@
 #include "stats.h"
-
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -10,11 +9,11 @@ Stats::Stats(std::string logFile)
 
 void Stats::startRun() {
     runNumber++;
-    startTime = std::chrono::steady_clock::now();
+    startTime = Clock::now();
 }
 
 void Stats::endRun() {
-    const auto endTime{ std::chrono::steady_clock::now() };
+    const auto endTime{ Clock::now() };
     runTimes.push_back(std::chrono::duration_cast<Duration>(endTime - startTime));
     if (runNumber % 1000 == 0) {
         std::cout << "Reached " << runNumber << "th iteration" << std::endl;

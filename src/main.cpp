@@ -9,7 +9,7 @@
 
 // Initialize "boids" randomly and change "grid" accordingly.
 template<typename LockPolicy>
-void randomizeBoids(Boids& boids, Grid<LockPolicy>& grid, const Settings::Settings& settings) {
+void randomizeBoids(Boids& boids, Grid<LockPolicy>& grid, const Settings& settings) {
     std::mt19937 generator{ std::random_device{}() };
     for (size_t i{ 0 }; i < boids.population; i++) {
         boids.x[i] = std::fmodf(static_cast<float>(generator()), static_cast<float>(settings.screenWidth) - .1f);
@@ -36,7 +36,7 @@ float calculateNorm(const float x, const float y) {
 
 // Update "boids" velocities.
 template<typename LockPolicy>
-void updateBoidsVelocities(Boids& boids, const Grid<LockPolicy>& grid, const Settings::Settings& settings) {
+void updateBoidsVelocities(Boids& boids, const Grid<LockPolicy>& grid, const Settings& settings) {
 #pragma omp for schedule(dynamic, settings.neighborLoopChunkSize)
     for (int i{ 0 }; i < boids.population; i++) {
         size_t visibleBoidsNum{ 0 };
@@ -114,7 +114,7 @@ void updateBoidsVelocities(Boids& boids, const Grid<LockPolicy>& grid, const Set
 
 // Update "boids" positions and "grid" accordingly.
 template<typename LockPolicy>
-void updateBoidsPositions(Boids& boids, Grid<LockPolicy>& grid, const Settings::Settings& settings, const std::chrono::duration<float> elapsedSec) {
+void updateBoidsPositions(Boids& boids, Grid<LockPolicy>& grid, const Settings& settings, const std::chrono::duration<float> elapsedSec) {
 #pragma omp for schedule(static)
     for (int i{ 0 }; i < boids.population; i++) {
         boids.x[i] += elapsedSec.count() * boids.vx[i];
@@ -134,7 +134,7 @@ void updateBoidsPositions(Boids& boids, Grid<LockPolicy>& grid, const Settings::
 }
 
 // Update "boids" vertices.
-void updateBoidsVertices(Boids& boids, SDL_Renderer* renderer, const Settings::Settings& settings) {
+void updateBoidsVertices(Boids& boids, SDL_Renderer* renderer, const Settings& settings) {
     for (size_t i{ 0 }; i < boids.population; i++) {
         const float norm{ calculateNorm(boids.vx[i], boids.vy[i]) };
         if (norm == 0.0f) continue;
@@ -161,7 +161,7 @@ void updateBoidsVertices(Boids& boids, SDL_Renderer* renderer, const Settings::S
 }
 
 int main(int argc, char* argv[]) {
-    const auto settings{ Settings::loadSettings(argc > 1 ? argv[1] : "settings.txt") };
+    const auto settings{ loadSettings(argc > 1 ? argv[1] : "settings.txt") };
     Stats stats{ "log.txt" };
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window* window;
