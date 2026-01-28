@@ -13,13 +13,19 @@ In addition to these I implemented 2 additional rules:
 + velocity clamping: the velocity of each boid should be in a certain range;
 + turning: when a boid gets too close to the border of the window it starts turning.
 
-![A frame of the boids](img/BoidsImage.png)
+<div align=center>
+<img src=img/BoidsImage.png width=60%>
+</div>
 
 ## How to Build
 
 **IMPORTANT**\
-If you are not using MSVC to compile the code you have to add to [CMakeList](CMakeLists.txt) your compiler options.\
-Your code should look like this:
+If you are not using MSVC to compile the code you have to add to [CMakeList](CMakeLists.txt) your compiler flags.\
+Also, even if you are using MSVC, there are flags you might want to change:
++ /arch:AVX2 if your CPU doesn't support it or support something better,
++ /favor:INTEL64 if your CPU isn't an Intel processor.
+
+Your change in CMakeList should look like this:
 ```cmake
 if (<MY_COMPILER>)
     set(CMAKE_CXX_FLAGS_RELEASE <FLAGS_TO_COMPILE_FOR_SPEED>)
@@ -31,7 +37,7 @@ endif()
 ```
 
 1. Create a folder called "lib" in the root folder
-2. Download SDL3 and put it into the "lib" folder renaming it "SDL"\
+2. Download [SDL3](https://github.com/libsdl-org/SDL) and put it into the "lib" folder renaming it "SDL"\
 (the program was tested with SDL 3.2.24)
 3. Build with CMake
 (you can decide whether to enable or disable OpenMP)
@@ -51,7 +57,7 @@ To run the program with custom settings either modify the "settings.txt" found  
 or run the program in the command line using as argument the path to your settings.
 
 ```sh
-Boids.exe path\to\my\settings.txt
+Boids.exe path/to/my/settings.txt
 ```
 
 ## Settings
@@ -83,3 +89,20 @@ All velocities are to be expressed in pixel/second.\
 If a line starts with "#" the program will skip it.
 
 [settings](settings.txt) provide an example of settings file.
+
+## Speedup
+
+In this section there are graphs showing how the performance of the program change as we increase the number of threads
+in different settings.
+
+Simulating 1k boids, the best speedup is almost 8 with 10 threads.
+
+<img src=img/StrongScaling1kTimeStats.png width=50%><img src=img/StrongScaling1kSpeedupStats.png width=50%>
+
+Simulating 10k boids, the best speedup is 7 with 16 threads.
+
+<img src=img/StrongScaling10kTimeStats.png width=50%><img src=img/StrongScaling10kSpeedupStats.png width=50%>
+
+Simulating 50k boids, the best speedup is almost 6 with 16 threads.
+
+<img src=img/StrongScaling50kTimeStats.png width=50%><img src=img/StrongScaling50kSpeedupStats.png width=50%>
